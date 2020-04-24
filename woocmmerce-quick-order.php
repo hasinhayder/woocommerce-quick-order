@@ -29,7 +29,7 @@ add_action('admin_enqueue_scripts', 'wqo_scripts');
 add_action('admin_menu', function () {
     add_menu_page(
         __('Quick Order Create', 'wqo'),
-        __('Quick Order Create', 'wqo'),
+        __('WC Quick Order', 'wqo'),
         'manage_options',
         'quick-order-create',
         'wqo_admin_page'
