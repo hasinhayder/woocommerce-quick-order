@@ -1,18 +1,18 @@
 ; (function ($) {
     $(document).ready(function () {
 
-        $("#wqo_genpw").on('click', function () {
-            $.post(wqo.ajax_url, { 'action': 'wqo_genpw', 'nonce': wqo.nonce }, function (data) {
+        $("#qofw_genpw").on('click', function () {
+            $.post(qofw.ajax_url, { 'action': 'qofw_genpw', 'nonce': qofw.nonce }, function (data) {
                 $("#password").val(data);
             });
         });
         $("#coupon").on('click', function () {
             if ($(this).attr('checked')) {
-                $("#discount-label").html(wqo.dc);
-                $("#discount").attr("placeholder", wqo.cc);
+                $("#discount-label").html(qofw.dc);
+                $("#discount").attr("placeholder", qofw.cc);
             } else {
-                $("#discount-label").html(wqo.dt);
-                $("#discount").attr("placeholder", wqo.dt);
+                $("#discount-label").html(qofw.dt);
+                $("#discount").attr("placeholder", qofw.dt);
             }
         });
 
@@ -23,8 +23,8 @@
             $("#first_name").val('');
             $("#last_name").val('');
             let email = $(this).val();
-            //alert(wqo.ajax_url);
-            $.post(wqo.ajax_url, { 'action': 'wqo_fetch_user', 'email': email, 'nonce': wqo.nonce }, function (data) {
+            //alert(qofw.ajax_url);
+            $.post(qofw.ajax_url, { 'action': 'qofw_fetch_user', 'email': email, 'nonce': qofw.nonce }, function (data) {
                 if ($("#first_name").val() == '') {
                     $("#first_name").val(data.fn);
                 }
@@ -48,8 +48,8 @@
         });
 
 
-        if ($('#wqo-edit-button').length > 0) {
-            tb_show(wqo.pt, "#TB_inline?inlineId=wqo-modal&width=700");
+        if ($('#qofw-edit-button').length > 0) {
+            tb_show(qofw.pt, "#TB_inline?inlineId=qofw-modal&width=700");
         }
     });
 })(jQuery);

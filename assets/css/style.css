@@ -279,36 +279,36 @@ https://github.com/pure-css/pure/blob/master/LICENSE.md
   }
   
 
-/*WooCommerce Quick Order */
+/* Quick Order For Woocommerce */
 
-.wqo-form-wrapper {
+.qofw-form-wrapper {
   margin-right: 20px;
   margin-top: 20px;
 }
-.wqo-form-title {
+.qofw-form-title {
   background-color: #222;
   color: #eee;
 }
 
-.wqo-form-title h4 {
+.qofw-form-title h4 {
   font-size: 16px;
   padding: 20px;
   margin: 0px;
 }
 
-.wqo-form-container {
+.qofw-form-container {
   padding: 50px 20px;
   background-color: #fff;
   color: #222;
   min-height: 300px;
 }
 
-.wqo-control {
+.qofw-control {
   width: 500px;
   height: 46px;
 }
 
-.wqo-control-right-gap {
+.qofw-control-right-gap {
   width: 364px;
   height: 46px;
 }
@@ -317,35 +317,35 @@ https://github.com/pure-css/pure/blob/master/LICENSE.md
   max-width: 50rem;
 }
 
-.wqo-form {
+.qofw-form {
   width: 780px;
   float: left;
 }
 
-.wqo-info {
+.qofw-info {
   width: 300px;
   float: left;
   min-height: 400px;
 }
-.wqo-info p {
+.qofw-info p {
   margin: 0px;
   line-height: 1.5em;
   font-size: 18px;
 }
 
-.wqo-clearfix {
+.qofw-clearfix {
   clear: both;
 }
 
-#wqo-modal {
+#qofw-modal {
   display: none;
 }
 
-.wqo-modal-content {
+.qofw-modal-content {
   padding: 10px;
 }
 
-.wqo-modal-content p {
+.qofw-modal-content p {
   font-size: 20px;
 }
 
