@@ -51,7 +51,7 @@ function wqo_admin_page() {
         </div>
         <div class='wqo-form-container'>
             <div class="wqo-form">
-                <form class='pure-form pure-form-aligned' method='POST'>
+                <form action='<?php echo esc_url(admin_url('admin-post.php')); ?>' class='pure-form pure-form-aligned' method='POST'>
                     <fieldset>
                         <input type='hidden' name='customer_id' id='customer_id' value='0'>
                         <div class='pure-control-group'>
@@ -127,9 +127,9 @@ function wqo_admin_page() {
                                 <?php _e('Create Order', 'wqo'); ?>
                             </button>
                         </div>
-
-
                     </fieldset>
+                    <input type="hidden" name="action" value="wqo_form">
+                    <input type="hidden" name="wqo_identifier" value="<?php echo md5(time()); ?>">
                     <?php wp_nonce_field('wqo_form', 'wqo_form_nonce'); ?>
                 </form>
             </div>
@@ -143,8 +143,8 @@ function wqo_admin_page() {
     <div id="wqo-modal">
         <div class="wqo-modal-content">
             <?php
-            if (isset($_POST['submit'])) {
-                wqo_process_submission();
+            if (isset($_GET['order_id'])) {
+                do_action('wqo_order_processing_complete', sanitize_text_field($_GET['order_id']));
             }
             ?>
         </div>
@@ -153,6 +153,17 @@ function wqo_admin_page() {
 <?php
 
 }
+add_action('admin_post_wqo_form', function () {
+    if (isset($_POST['submit'])) {
+        $order_id =  wqo_process_submission();
+        wp_safe_redirect(
+            esc_url_raw(
+                add_query_arg('order_id', $order_id, admin_url('admin.php?page=quick-order-create'))
+            )
+        );
+    }
+});
+
 
 add_action('wp_ajax_wqo_genpw', function () {
     echo wp_generate_password(12);
@@ -187,6 +198,11 @@ add_action('wp_ajax_wqo_fetch_user', function () {
 });
 
 function wqo_process_submission() {
+    $wqo_order_identifier = $_POST['wqo_identifier'];
+    $processed = get_transient("wqo{$wqo_order_identifier}");
+    if ($processed) {
+        return $processed;
+    }
     if (wp_verify_nonce($_POST['wqo_form_nonce'], 'wqo_form')) {
         if ($_POST['customer_id'] == 0) {
             $email = strtolower(sanitize_text_field($_POST['email']));
@@ -227,6 +243,9 @@ function wqo_process_submission() {
             'billing_first_name' => $customer->first_name,
             'billing_last_name' => $customer->last_name,
         ));
+
+        set_transient("wqo{$wqo_order_identifier}", $order_id, 60);
+
         $order = wc_get_order($order_id);
         update_post_meta($order_id, '_customer_user', $customer->ID);
         if ($isCoupon) {
@@ -242,12 +261,11 @@ function wqo_process_submission() {
         }
         $order_status = apply_filters('wqo_order_status', 'processing');
         $order->set_status($order_status);
-        $order->save();
-        $cart->empty_cart();
         do_action('wqo_order_complete', $order_id);
+        return $order->save();
     }
 }
-add_action('wqo_order_complete', function ($order_id) {
+add_action('wqo_order_processing_complete', function ($order_id) {
     $order = wc_get_order($order_id);
     $message =  __("<p>Your order number %s is now complete. Please click the next button to edit this order</p><p>%s</p>", 'wqo');
     $order_button = sprintf("<a target='_blank' href='%s' id='wqo-edit-button' class='button button-primary button-hero'>%s %s</a>", $order->get_edit_order_url(), __('Edit Order # ', 'wqo'), $order_id);
