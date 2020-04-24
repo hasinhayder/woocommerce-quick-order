@@ -4,7 +4,7 @@ Plugin Name: Quick Order For WooCommerce
 Plugin URI: https://github.com/hasinhayder/woocommerce-quick-order
 Description: Quickly create WooCommerce order for existing and new customers. 
 Version: 1.0.0
-Author: Plain Hasin Hayder
+Author: Hasin Hayder
 Author URI: https://hasin.me
 License: GPLv2 or later
 Text Domain: qofw
@@ -196,13 +196,13 @@ add_action('wp_ajax_qofw_fetch_user', function () {
 });
 
 function qofw_process_submission() {
-    $qofw_order_identifier = $_POST['qofw_identifier'];
+    $qofw_order_identifier = sanitize_text_field($_POST['qofw_identifier']);
     $processed = get_transient("qofw{$qofw_order_identifier}");
     if ($processed) {
         return $processed;
     }
-    if (wp_verify_nonce($_POST['qofw_form_nonce'], 'qofw_form')) {
-        if ($_POST['customer_id'] == 0) {
+    if (wp_verify_nonce(sanitize_text_field($_POST['qofw_form_nonce']), 'qofw_form')) {
+        if (sanitize_text_field($_POST['customer_id']) == 0) {
             $email = strtolower(sanitize_text_field($_POST['email']));
             $first_name = sanitize_text_field($_POST['first_name']);
             $last_name = sanitize_text_field($_POST['last_name']);
