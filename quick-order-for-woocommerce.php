@@ -12,8 +12,8 @@ Text Domain: qofw
 
 function qofw_scripts($hook) {
     if ('toplevel_page_quick-order-create' == $hook) {
-        wp_enqueue_style('qofw-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', array(), time());
-        wp_enqueue_script('qofw-script', plugin_dir_url(__FILE__) . 'assets/js/qofw.js', array('jquery', 'thickbox'), time(), true);
+        wp_enqueue_style('qofw-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', array(), '1.0.0');
+        wp_enqueue_script('qofw-script', plugin_dir_url(__FILE__) . 'assets/js/qofw.js', array('jquery', 'thickbox'), '1.0.0', true);
         $nonce = wp_create_nonce('qofw');
         wp_localize_script('qofw-script', 'qofw', array(
             'nonce' => $nonce,
