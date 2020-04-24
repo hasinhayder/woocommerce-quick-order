@@ -1,4 +1,4 @@
-=== WooCommerce Quick Order ===
+=== Wc Quick Order ===
 Contributors: hasinhayder
 Donate link: 
 Tags: woocommerce, order, cart, discount
