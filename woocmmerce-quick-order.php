@@ -1,14 +1,14 @@
 <?php
 /*
-    Plugin Name: WooCommerce Quick Order
-    Plugin URI:
-    Description: Friendly Description
-    Version: 1.0.0
-    Author: Plain Text Author Name
-    Author URI:
-    License: GPLv2 or later
-    Text Domain: wqo
-     */
+Plugin Name: WooCommerce Quick Order
+Plugin URI:
+Description: Quickly create WooCommerce order for existing and new customers. 
+Version: 1.0.0
+Author: Plain Hasin Hayder
+Author URI: https://github.com/hasinhayder/woocommerce-quick-order
+License: GPLv2 or later
+Text Domain: wqo
+*/
 
 function wqo_scripts($hook) {
     if ('toplevel_page_quick-order-create' == $hook) {
@@ -35,7 +35,7 @@ add_action('admin_menu', function () {
     add_menu_page(
         __('Quick Order Create', 'wqo'),
         __('WC Quick Order', 'wqo'),
-        'manage_options',
+        'manage_woocommerce',
         'quick-order-create',
         'wqo_admin_page'
     );
@@ -109,16 +109,16 @@ function wqo_admin_page() {
                                 foreach ($products as $product) {
                                 ?>
                                     <option value='<?php echo $product->get_ID(); ?>''><?php echo $product->get_Name(); ?></option>
-                            <?php
-                                }
-                            ?>
-                        </select>
-                    </div>
+                                <?php
+                                    }
+                                ?>
+                            </select>
+                        </div>
 
-                    <div class=' pure-control-group'>
-                                        <?php $label = __('Order Note', 'wqo'); ?>
-                                        <label for='note'><?php echo $label; ?></label>
-                                        <input class='wqo-control' name='note' id="note" type='text' placeholder='<?php echo $label; ?>'>
+                        <div class=' pure-control-group'>
+                            <?php $label = __('Order Note', 'wqo'); ?>
+                            <label for='note'><?php echo $label; ?></label>
+                            <input class='wqo-control' name='note' id="note" type='text' placeholder='<?php echo $label; ?>'>
                         </div>
 
                         <div class='pure-control-group' style='margin-top:20px;'>

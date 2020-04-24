@@ -267,6 +267,20 @@ https://github.com/pure-css/pure/blob/master/LICENSE.md
   font-size: 0.875em;
 }
 
+/* Modified */
+
+.pure-form-aligned .pure-control-group label {
+    width: 15em;
+  }
+  
+  
+.pure-form select {
+    height: 46px;
+  }
+  
+
+/*WooCommerce Quick Order */
+
 .wqo-form-wrapper {
   margin-right: 20px;
   margin-top: 20px;
@@ -288,9 +302,6 @@ https://github.com/pure-css/pure/blob/master/LICENSE.md
   color: #222;
   min-height: 300px;
 }
-.pure-form-aligned .pure-control-group label {
-  width: 15em;
-}
 
 .wqo-control {
   width: 500px;
@@ -304,10 +315,6 @@ https://github.com/pure-css/pure/blob/master/LICENSE.md
 
 .wp-core-ui select {
   max-width: 50rem;
-}
-
-.pure-form select {
-  height: 46px;
 }
 
 .wqo-form {
