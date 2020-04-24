@@ -9,6 +9,7 @@ https://github.com/pure-css/pure/blob/master/LICENSE.md
 
 .wqo-form-wrapper{
     margin-right: 20px;
+    margin-top:20px;
 }
 .wqo-form-title{
     background-color: #222;
@@ -47,4 +48,26 @@ https://github.com/pure-css/pure/blob/master/LICENSE.md
 
 .pure-form select{
     height:46px;
+}
+
+.wqo-form{
+    width: 780px;
+    float:left;
+}
+
+.wqo-info{
+    width: 300px;
+    float:left;
+    min-height: 400px;
+}
+.wqo-info p{
+    margin:0px;
+    line-height: 1.5em;
+    font-size:18px;
+}
+
+
+
+.wqo-clearfix{
+    clear: both;
 }

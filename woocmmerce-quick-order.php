@@ -14,6 +14,7 @@ function wqo_scripts($hook) {
     if ('toplevel_page_quick-order-create' == $hook) {
         wp_enqueue_style('wqo-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', array(), time());
         wp_enqueue_script('wqo-script', plugin_dir_url(__FILE__) . 'assets/js/wqo.js', array('jquery'), time(), true);
+        wp_enqueue_script('lepture-script', '//cdn.jsdelivr.net/github-cards/latest/widget.js', array(), '1.0', true);
         $nonce = wp_create_nonce('wqo');
         wp_localize_script('wqo-script', 'wqo', array(
             'nonce' => $nonce,
@@ -38,98 +39,104 @@ add_action('admin_menu', function () {
 
 function wqo_admin_page() {
 ?>
-    <h2><?php _e('Quick Order Create', 'wqo'); ?></h2>
+    <!-- <h2><?php _e('Quick Order Create', 'wqo'); ?></h2> -->
 
     <div class="wqo-form-wrapper">
         <div class="wqo-form-title">
-            <h4><?php _e('WooCommerce Quick Order Create', 'wqo'); ?></h4>
+            <h4><?php _e('WooCommerce Quick Order', 'wqo'); ?></h4>
         </div>
         <div class='wqo-form-container'>
-            <form class='pure-form pure-form-aligned' method='POST'>
-                <fieldset>
-                    <input type='hidden' name='customer_id' id='customer_id' value='0'>
-                    <div class='pure-control-group'>
-                        <?php $label = __('Email Address', 'wqo'); ?>
-                        <label for='name'><?php echo $label; ?></label>
-                        <input class='wqo-control' required name='email' id='email' type='email' placeholder='<?php echo $label; ?>'>
-                        <span class='pure-form-message-inline' style="display:none" id='lmsg'>Checking For Existing User</span>
-                    </div>
+            <div class="wqo-form">
+                <form class='pure-form pure-form-aligned' method='POST'>
+                    <fieldset>
+                        <input type='hidden' name='customer_id' id='customer_id' value='0'>
+                        <div class='pure-control-group'>
+                            <?php $label = __('Email Address', 'wqo'); ?>
+                            <label for='name'><?php echo $label; ?></label>
+                            <input class='wqo-control' required name='email' id='email' type='email' placeholder='<?php echo $label; ?>'>
+                            <span class='pure-form-message-inline' style="display:none" id='lmsg'>Checking For Existing User</span>
+                        </div>
 
-                    <div class='pure-control-group'>
-                        <?php $label = __('First Name', 'wqo'); ?>
-                        <label for='first_name'><?php echo $label; ?></label>
-                        <input class='wqo-control' required name='first_name' id='first_name' type='text' placeholder='<?php echo $label; ?>'>
-                    </div>
+                        <div class='pure-control-group'>
+                            <?php $label = __('First Name', 'wqo'); ?>
+                            <label for='first_name'><?php echo $label; ?></label>
+                            <input class='wqo-control' required name='first_name' id='first_name' type='text' placeholder='<?php echo $label; ?>'>
+                        </div>
 
-                    <div class='pure-control-group'>
-                        <?php $label = __('Last Name', 'wqo'); ?>
-                        <label for='last_name'><?php echo $label; ?></label>
-                        <input class='wqo-control' required name='last_name' id='last_name' type='text' placeholder='<?php echo $label; ?>'>
-                    </div>
+                        <div class='pure-control-group'>
+                            <?php $label = __('Last Name', 'wqo'); ?>
+                            <label for='last_name'><?php echo $label; ?></label>
+                            <input class='wqo-control' required name='last_name' id='last_name' type='text' placeholder='<?php echo $label; ?>'>
+                        </div>
 
-                    <div class='pure-control-group' id='password_container'>
-                        <?php $label = __('Password', 'wqo'); ?>
-                        <label for='password'><?php echo $label; ?></label>
-                        <input class='wqo-control-right-gap' name='password' id='password' type='text' placeholder='<?php echo $label; ?>'>
-                        <button type='button' id='wqo_genpw' class="button button-primary button-hero">
-                            <?php _e('Generate', 'wqo'); ?>
-                        </button>
-                    </div>
+                        <div class='pure-control-group' id='password_container'>
+                            <?php $label = __('Password', 'wqo'); ?>
+                            <label for='password'><?php echo $label; ?></label>
+                            <input class='wqo-control-right-gap' name='password' id='password' type='text' placeholder='<?php echo $label; ?>'>
+                            <button type='button' id='wqo_genpw' class="button button-primary button-hero">
+                                <?php _e('Generate', 'wqo'); ?>
+                            </button>
+                        </div>
 
-                    <div class='pure-control-group'>
-                        <?php $label = __('Phone Number', 'wqo'); ?>
-                        <label for='phone'><?php echo $label; ?></label>
-                        <input class='wqo-control' name='phone' id='phone' type='text' placeholder='<?php echo $label; ?>'>
-                    </div>
+                        <div class='pure-control-group'>
+                            <?php $label = __('Phone Number', 'wqo'); ?>
+                            <label for='phone'><?php echo $label; ?></label>
+                            <input class='wqo-control' name='phone' id='phone' type='text' placeholder='<?php echo $label; ?>'>
+                        </div>
 
-                    <div class='pure-control-group'>
-                        <?php $label = __('Discount in Taka', 'wqo'); ?>
-                        <label id="discount-label" for="discount"><?php echo $label; ?></label>
-                        <input class='wqo-control' name="discount" id="discount" type='text' placeholder='<?php echo $label; ?>'>
-                    </div>
+                        <div class='pure-control-group'>
+                            <?php $label = __('Discount in Taka', 'wqo'); ?>
+                            <label id="discount-label" for="discount"><?php echo $label; ?></label>
+                            <input class='wqo-control' name="discount" id="discount" type='text' placeholder='<?php echo $label; ?>'>
+                        </div>
 
-                    <div class='pure-control-group' style="margin-top:20px;margin-bottom:20px;">
-                        <?php $label = __('I want to input coupon code', 'wqo'); ?>
-                        <label for='coupon'></label>
-                        <input type='checkbox' name='coupon' id='coupon' value='1' /><?php echo $label; ?>
-                    </div>
+                        <div class='pure-control-group' style="margin-top:20px;margin-bottom:20px;">
+                            <?php $label = __('I want to input coupon code', 'wqo'); ?>
+                            <label for='coupon'></label>
+                            <input type='checkbox' name='coupon' id='coupon' value='1' /><?php echo $label; ?>
+                        </div>
 
-                    <div class='pure-control-group'>
-                        <?php $label = __('Product Name', 'wqo'); ?>
-                        <label for='item'><?php echo $label; ?></label>
-                        <select class='wqo-control' name='item' id='item'>
-                            <option value="0">Select One</option>
+                        <div class='pure-control-group'>
+                            <?php $label = __('Product Name', 'wqo'); ?>
+                            <label for='item'><?php echo $label; ?></label>
+                            <select class='wqo-control' name='item' id='item'>
+                                <option value="0">Select One</option>
+                                <?php
+                                $products = wc_get_products(array('post_status' => 'published', 'posts_per_page' => -1));
+                                foreach ($products as $product) {
+                                ?>
+                                    <option value='<?php echo $product->get_ID(); ?>''><?php echo $product->get_Name(); ?></option>
                             <?php
-                            $products = wc_get_products(array('post_status' => 'published', 'posts_per_page' => -1));
-                            foreach ($products as $product) {
-                            ?>
-                                <option value='<?php echo $product->get_ID(); ?>''><?php echo $product->get_Name(); ?></option>
-                            <?php
-                            }
+                                }
                             ?>
                         </select>
                     </div>
 
                     <div class=' pure-control-group'>
-                                    <?php $label = __('Order Note', 'wqo'); ?>
-                                    <label for='note'><?php echo $label; ?></label>
-                                    <input class='wqo-control' name='note' id="note" type='text' placeholder='<?php echo $label; ?>'>
-                    </div>
+                                        <?php $label = __('Order Note', 'wqo'); ?>
+                                        <label for='note'><?php echo $label; ?></label>
+                                        <input class='wqo-control' name='note' id="note" type='text' placeholder='<?php echo $label; ?>'>
+                        </div>
 
-                    <div class='pure-control-group' style='margin-top:20px;'>
-                        <label></label>
-                        <button type='submit' name='submit' class='button button-primary button-hero'>
-                            <?php _e('Create Order', 'wqo'); ?>
-                        </button>
-                    </div>
+                        <div class='pure-control-group' style='margin-top:20px;'>
+                            <label></label>
+                            <button type='submit' name='submit' class='button button-primary button-hero'>
+                                <?php _e('Create Order', 'wqo'); ?>
+                            </button>
+                        </div>
 
-                    <?php
-                    if (isset($_POST['submit'])) {
-                        wqo_process_submission();
-                    }
-                    ?>
-                </fieldset>
-            </form>
+                        <?php
+                        if (isset($_POST['submit'])) {
+                            wqo_process_submission();
+                        }
+                        ?>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="wqo-info">
+            <div class="github-card" data-github="hasinhayder" data-width="100%" data-height="" data-theme="medium"></div>
+            </div>
+            <div class="wqo-clearfix"></div>
         </div>
 
     </div>
