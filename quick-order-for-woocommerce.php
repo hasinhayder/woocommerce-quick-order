@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Quick Order For WooCommerce
-Plugin URI:
+Plugin URI: https://github.com/hasinhayder/woocommerce-quick-order
 Description: Quickly create WooCommerce order for existing and new customers. 
 Version: 1.0.0
 Author: Plain Hasin Hayder
-Author URI: https://github.com/hasinhayder/woocommerce-quick-order
+Author URI: https://hasin.me
 License: GPLv2 or later
 Text Domain: qofw
 */
