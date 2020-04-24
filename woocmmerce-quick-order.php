@@ -130,6 +130,7 @@ function wqo_admin_page() {
 
 
                     </fieldset>
+                    <?php wp_nonce_field('wqo_form', 'wqo_form_nonce'); ?>
                 </form>
             </div>
             <div class="wqo-info">
@@ -186,64 +187,65 @@ add_action('wp_ajax_wqo_fetch_user', function () {
 });
 
 function wqo_process_submission() {
-    if ($_POST['customer_id'] == 0) {
-        $email = strtolower(sanitize_text_field($_POST['email']));
-        $first_name = sanitize_text_field($_POST['first_name']);
-        $last_name = sanitize_text_field($_POST['last_name']);
-        $password = sanitize_text_field($_POST['password']);
-        $phone_number = sanitize_text_field($_POST['phone']);
-        $customer = wp_create_user($email, $password, $email);
-        update_user_meta($customer, 'first_name', $first_name);
-        update_user_meta($customer, 'last_name', $last_name);
-        update_user_meta($customer, 'phone_number', $phone_number);
-        $customer = new WP_User($customer);
-    } else {
-        $customer = new WP_User(sanitize_text_field($_POST['customer_id']));
-    }
-    WC()->frontend_includes();
-    WC()->session = new WC_Session_Handler();
-    WC()->session->init();
-    WC()->customer = new WC_Customer($customer->ID, 1);
+    if (wp_verify_nonce($_POST['wqo_form_nonce'], 'wqo_form')) {
+        if ($_POST['customer_id'] == 0) {
+            $email = strtolower(sanitize_text_field($_POST['email']));
+            $first_name = sanitize_text_field($_POST['first_name']);
+            $last_name = sanitize_text_field($_POST['last_name']);
+            $password = sanitize_text_field($_POST['password']);
+            $phone_number = sanitize_text_field($_POST['phone']);
+            $customer = wp_create_user($email, $password, $email);
+            update_user_meta($customer, 'first_name', $first_name);
+            update_user_meta($customer, 'last_name', $last_name);
+            update_user_meta($customer, 'phone_number', $phone_number);
+            $customer = new WP_User($customer);
+        } else {
+            $customer = new WP_User(sanitize_text_field($_POST['customer_id']));
+        }
+        WC()->frontend_includes();
+        WC()->session = new WC_Session_Handler();
+        WC()->session->init();
+        WC()->customer = new WC_Customer($customer->ID, 1);
 
-    $cart = new WC_Cart();
-    WC()->cart = $cart;
-    $cart->empty_cart();
-    $cart->add_to_cart(sanitize_text_field($_POST['item']), 1);
+        $cart = new WC_Cart();
+        WC()->cart = $cart;
+        $cart->empty_cart();
+        $cart->add_to_cart(sanitize_text_field($_POST['item']), 1);
 
-    $discount = trim(sanitize_text_field($_POST['discount']));
-    if ($discount == '') {
-        $discount = 0;
-    }
-    $isCoupon = (isset($_POST['coupon'])) ? true : false;
+        $discount = trim(sanitize_text_field($_POST['discount']));
+        if ($discount == '') {
+            $discount = 0;
+        }
+        $isCoupon = (isset($_POST['coupon'])) ? true : false;
 
-    $checkout = WC()->checkout();
-    $phone = sanitize_text_field($_POST['phone']);
-    $order_id = $checkout->create_order(array(
-        'billing_phone' => $phone,
-        'billing_email' => $customer->user_email,
-        'payment_method' => 'cash',
-        'billing_first_name' => $customer->first_name,
-        'billing_last_name' => $customer->last_name,
-    ));
-    $order = wc_get_order($order_id);
-    update_post_meta($order_id, '_customer_user', $customer->ID);
-    if ($isCoupon) {
-        $order->apply_coupon($discount);
-    } elseif ($discount > 0) {
-        $total = $order->calculate_totals();
-        $order->set_discount_total($discount);
-        $order->set_total($total - floatval($discount));
+        $checkout = WC()->checkout();
+        $phone = sanitize_text_field($_POST['phone']);
+        $order_id = $checkout->create_order(array(
+            'billing_phone' => $phone,
+            'billing_email' => $customer->user_email,
+            'payment_method' => 'cash',
+            'billing_first_name' => $customer->first_name,
+            'billing_last_name' => $customer->last_name,
+        ));
+        $order = wc_get_order($order_id);
+        update_post_meta($order_id, '_customer_user', $customer->ID);
+        if ($isCoupon) {
+            $order->apply_coupon($discount);
+        } elseif ($discount > 0) {
+            $total = $order->calculate_totals();
+            $order->set_discount_total($discount);
+            $order->set_total($total - floatval($discount));
+        }
+        if (isset($_POST['note']) && !empty($_POST['note'])) {
+            $order_note = apply_filters('wqo_order_note', sanitize_text_field($_POST['note']), $order_id);
+            $order->add_order_note($order_note);
+        }
+        $order_status = apply_filters('wqo_order_status', 'processing');
+        $order->set_status($order_status);
+        $order->save();
+        $cart->empty_cart();
+        do_action('wqo_order_complete', $order_id);
     }
-    if (isset($_POST['note']) && !empty($_POST['note'])) {
-        $order_note = apply_filters('wqo_order_note', sanitize_text_field($_POST['note']), $order_id);
-        $order->add_order_note($order_note);
-    }
-    $order_status = apply_filters('wqo_order_status', 'processing');
-    $order->set_status($order_status);
-    // $order->payment_complete();
-    $order->save();
-    $cart->empty_cart();
-    do_action('wqo_order_complete', $order_id);
 }
 add_action('wqo_order_complete', function ($order_id) {
     $order = wc_get_order($order_id);
