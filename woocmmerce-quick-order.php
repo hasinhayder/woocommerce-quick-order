@@ -100,22 +100,22 @@ function wqo_admin_page() {
                             <?php $label = __('Product Name', 'wqo'); ?>
                             <label for='item'><?php echo $label; ?></label>
                             <select class='wqo-control' name='item' id='item'>
-                                <option value="0">Select One</option>
+                                <option value="0"><?php _e('Select One','wqo') ;?></option>
                                 <?php
                                 $products = wc_get_products(array('post_status' => 'published', 'posts_per_page' => -1));
                                 foreach ($products as $product) {
                                 ?>
                                     <option value='<?php echo $product->get_ID(); ?>''><?php echo $product->get_Name(); ?></option>
                                 <?php
-                                    }
+                                }
                                 ?>
                             </select>
                         </div>
 
                         <div class=' pure-control-group'>
-                            <?php $label = __('Order Note', 'wqo'); ?>
-                            <label for='note'><?php echo $label; ?></label>
-                            <input class='wqo-control' name='note' id="note" type='text' placeholder='<?php echo $label; ?>'>
+                                        <?php $label = __('Order Note', 'wqo'); ?>
+                                        <label for='note'><?php echo $label; ?></label>
+                                        <input class='wqo-control' name='note' id="note" type='text' placeholder='<?php echo $label; ?>'>
                         </div>
 
                         <div class='pure-control-group' style='margin-top:20px;'>
@@ -162,7 +162,11 @@ add_action('admin_post_wqo_form', function () {
 
 
 add_action('wp_ajax_wqo_genpw', function () {
-    echo wp_generate_password(12);
+    $nonce = sanitize_text_field($_POST['nonce']);
+    $action = 'wqo';
+    if (wp_verify_nonce($nonce, $action)) {
+        echo wp_generate_password(12);
+    }
     die();
 });
 
