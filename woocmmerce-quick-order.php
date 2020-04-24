@@ -125,11 +125,9 @@ function wqo_admin_page() {
 
                     <?php
                     if (isset($_POST['submit'])) {
-                        echo '<hr/>';
                         wqo_process_submission();
                     }
                     ?>
-
                 </fieldset>
             </form>
         </div>
@@ -147,14 +145,26 @@ add_action('wp_ajax_wqo_genpw', function () {
 
 add_action('wp_ajax_wqo_fetch_user', function () {
     $nonce = sanitize_text_field($_POST['nonce']);
-    $email = sanitize_text_field($_POST['email']);
+    $email = strtolower(sanitize_text_field($_POST['email']));
     $action = 'wqo';
     if (wp_verify_nonce($nonce, $action)) {
         $user = get_user_by('email', $email);
         if ($user) {
-            echo json_encode(array('error' => false, 'id' => $user->ID, 'fn' => $user->first_name, 'ln' => $user->last_name));
+            echo json_encode(array(
+                'error' => false,
+                'id' => $user->ID,
+                'fn' => $user->first_name,
+                'ln' => $user->last_name,
+                'pn' => get_user_meta($user->ID, 'phone_number', true)
+            ));
         } else {
-            echo json_encode(array('error' => true, 'id' => 0, 'fn' => 'Not Found', 'ln' => 'Not Found'));
+            echo json_encode(array(
+                'error' => true,
+                'id' => 0,
+                'fn' => __('Not Found', 'wqo'),
+                'ln' => __('Not Found', 'wqo'),
+                'pn' => ''
+            ));
         }
     }
     die();
@@ -162,13 +172,15 @@ add_action('wp_ajax_wqo_fetch_user', function () {
 
 function wqo_process_submission() {
     if ($_POST['customer_id'] == 0) {
-        $email = sanitize_text_field($_POST['email']);
+        $email = strtolower(sanitize_text_field($_POST['email']));
         $first_name = sanitize_text_field($_POST['first_name']);
         $last_name = sanitize_text_field($_POST['last_name']);
         $password = sanitize_text_field($_POST['password']);
+        $phone_number = sanitize_text_field($_POST['phone']);
         $customer = wp_create_user($email, $password, $email);
         update_user_meta($customer, 'first_name', $first_name);
-        update_user_meta($customer, 'last_word', $last_name);
+        update_user_meta($customer, 'last_name', $last_name);
+        update_user_meta($customer, 'phone_number', $phone_number);
         $customer = new WP_User($customer);
     } else {
         $customer = new WP_User(sanitize_text_field($_POST['customer_id']));
@@ -183,7 +195,7 @@ function wqo_process_submission() {
     $cart->empty_cart();
     $cart->add_to_cart(sanitize_text_field($_POST['item']), 1);
 
-    $discount = sanitize_text_field($_POST['discount']);
+    $discount = trim(sanitize_text_field($_POST['discount']));
     if ($discount == '') {
         $discount = 0;
     }
@@ -191,27 +203,31 @@ function wqo_process_submission() {
 
     $checkout = WC()->checkout();
     $phone = sanitize_text_field($_POST['phone']);
-    $order_id = $checkout->create_order(array('billing_phone' => $phone, 'billing_email' => $customer->user_email, 'payment_method' => 'cash'));
+    $order_id = $checkout->create_order(array(
+        'billing_phone' => $phone,
+        'billing_email' => $customer->user_email,
+        'payment_method' => 'cash',
+        'billing_first_name' => $customer->first_name,
+        'billing_last_name' => $customer->last_name,
+    ));
     $order = wc_get_order($order_id);
     update_post_meta($order_id, '_customer_user', $customer->ID);
     if ($isCoupon) {
-        echo "Coupon {$discount}<br/>";
         $order->apply_coupon($discount);
     } elseif ($discount > 0) {
-        echo "Disc {$discount}<br/>";
         $total = $order->calculate_totals();
-        echo $total . ":<br/>";
-        echo $total - floatval($discount) . ":<br/>";
         $order->set_discount_total($discount);
         $order->set_total($total - floatval($discount));
     }
     if (isset($_POST['note']) && !empty($_POST['note'])) {
-        $order->add_order_note(sanitize_text_field($_POST['note']));
+        $order_note = apply_filters('wqo_order_note', sanitize_text_field($_POST['note']), $order_id);
+        $order->add_order_note($order_note);
     }
-    $order->set_status('completed');
+    $order_status = apply_filters('wqo_order_status', 'processing');
+    $order->set_status($order_status);
     $order->payment_complete();
     $order->save();
     $cart->empty_cart();
-    do_action('woocommerce_order_status_completed', $order_id);
-    printf("<a target='_blank' href='%s' class='button button-primary button-hero'>%s %s</a>", $order->get_edit_order_url(), __('Edit This Order', 'wqo'), $order_id);
+    do_action('wqo_order_complete', $order_id);
+    //printf("<a target='_blank' href='%s' class='button button-primary button-hero'>%s %s</a>", $order->get_edit_order_url(), __('Edit This Order', 'wqo'), $order_id);
 }

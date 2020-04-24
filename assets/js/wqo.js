@@ -5,7 +5,6 @@
             $.post(wqo.ajax_url, { 'action': 'wqo_genpw', 'nonce': wqo.nonce }, function (data) {
                 $("#password").val(data);
             });
-            //return false; 
         });
         $("#coupon").on('click', function () {
             if ($(this).attr('checked')) {
@@ -19,12 +18,18 @@
 
         $("#email").on('blur', function () {
             $("#lmsg").show();
+            $("#first_name").val('');
+            $("#last_name").val('');
             let email = $(this).val();
             //alert(wqo.ajax_url);
             $.post(wqo.ajax_url, { 'action': 'wqo_fetch_user', 'email': email, 'nonce': wqo.nonce }, function (data) {
-                console.log(data.fn);
-                $("#first_name").val(data.fn);
-                $("#last_name").val(data.ln);
+                if($("#first_name").val()==''){
+                    $("#first_name").val(data.fn);
+                }
+                if($("#last_name").val()==''){
+                    $("#last_name").val(data.ln);
+                }
+                $("#phone").val(data.pn);
                 $("#customer_id").val(data.id);
 
                 if (!data.error) {
