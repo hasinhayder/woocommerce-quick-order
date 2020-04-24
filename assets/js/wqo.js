@@ -17,16 +17,15 @@
         });
 
         $("#email").on('blur', function () {
-            $("#lmsg").show();
             $("#first_name").val('');
             $("#last_name").val('');
             let email = $(this).val();
             //alert(wqo.ajax_url);
             $.post(wqo.ajax_url, { 'action': 'wqo_fetch_user', 'email': email, 'nonce': wqo.nonce }, function (data) {
-                if($("#first_name").val()==''){
+                if ($("#first_name").val() == '') {
                     $("#first_name").val(data.fn);
                 }
-                if($("#last_name").val()==''){
+                if ($("#last_name").val() == '') {
                     $("#last_name").val(data.ln);
                 }
                 $("#phone").val(data.pn);
@@ -41,9 +40,13 @@
                     $("#first_name").removeAttr('readonly')
                     $("#last_name").removeAttr('readonly');
                 }
-                $("#lmsg").hide();
 
             }, "json");
         });
+
+
+        if ($('#wqo-edit-button').length > 0) {
+            tb_show(wqo.pt, "#TB_inline?inlineId=wqo-modal&width=700");
+        }
     });
 })(jQuery);

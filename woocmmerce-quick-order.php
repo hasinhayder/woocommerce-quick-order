@@ -13,16 +13,20 @@
 function wqo_scripts($hook) {
     if ('toplevel_page_quick-order-create' == $hook) {
         wp_enqueue_style('wqo-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', array(), time());
-        wp_enqueue_script('wqo-script', plugin_dir_url(__FILE__) . 'assets/js/wqo.js', array('jquery'), time(), true);
-        wp_enqueue_script('lepture-script', '//cdn.jsdelivr.net/github-cards/latest/widget.js', array(), '1.0', true);
+        wp_enqueue_script('wqo-script', plugin_dir_url(__FILE__) . 'assets/js/wqo.js', array('jquery', 'thickbox'), time(), true);
+        if (apply_filters('wqo_display_github_profile', true)) {
+            wp_enqueue_script('lepture-script', '//cdn.jsdelivr.net/github-cards/latest/widget.js', array(), '1.0', true);
+        }
         $nonce = wp_create_nonce('wqo');
         wp_localize_script('wqo-script', 'wqo', array(
             'nonce' => $nonce,
             'ajax_url' => admin_url('admin-ajax.php'),
             'dc' => __('Discount Coupon', 'wqo'),
             'cc' => __('Coupon Code', 'wqo'),
-            'dt' => __('Discount In Taka', 'wqo')
+            'dt' => __('Discount In Taka', 'wqo'),
+            'pt' => __('WooCommerce Quick Order', 'wqo'), //plugin title
         ));
+        add_thickbox();
     }
 }
 add_action('admin_enqueue_scripts', 'wqo_scripts');
@@ -54,7 +58,6 @@ function wqo_admin_page() {
                             <?php $label = __('Email Address', 'wqo'); ?>
                             <label for='name'><?php echo $label; ?></label>
                             <input class='wqo-control' required name='email' id='email' type='email' placeholder='<?php echo $label; ?>'>
-                            <span class='pure-form-message-inline' style="display:none" id='lmsg'>Checking For Existing User</span>
                         </div>
 
                         <div class='pure-control-group'>
@@ -125,20 +128,25 @@ function wqo_admin_page() {
                             </button>
                         </div>
 
-                        <?php
-                        if (isset($_POST['submit'])) {
-                            wqo_process_submission();
-                        }
-                        ?>
+
                     </fieldset>
                 </form>
             </div>
             <div class="wqo-info">
-            <div class="github-card" data-github="hasinhayder" data-width="100%" data-height="" data-theme="medium"></div>
+                <div class="github-card" data-github="hasinhayder" data-width="100%" data-height="" data-theme="medium"></div>
             </div>
             <div class="wqo-clearfix"></div>
         </div>
 
+    </div>
+    <div id="wqo-modal">
+        <div class="wqo-modal-content">
+            <?php
+            if (isset($_POST['submit'])) {
+                wqo_process_submission();
+            }
+            ?>
+        </div>
     </div>
 
 <?php
@@ -232,9 +240,15 @@ function wqo_process_submission() {
     }
     $order_status = apply_filters('wqo_order_status', 'processing');
     $order->set_status($order_status);
-    $order->payment_complete();
+    // $order->payment_complete();
     $order->save();
     $cart->empty_cart();
     do_action('wqo_order_complete', $order_id);
-    //printf("<a target='_blank' href='%s' class='button button-primary button-hero'>%s %s</a>", $order->get_edit_order_url(), __('Edit This Order', 'wqo'), $order_id);
 }
+add_action('wqo_order_complete', function ($order_id) {
+    $order = wc_get_order($order_id);
+    $message =  __("<p>Your order number %s is now complete. Please click the next button to edit this order</p><p>%s</p>", 'wqo');
+    $order_button = sprintf("<a target='_blank' href='%s' id='wqo-edit-button' class='button button-primary button-hero'>%s %s</a>", $order->get_edit_order_url(), __('Edit Order # ', 'wqo'), $order_id);
+
+    printf($message, $order_id, $order_button);
+});
