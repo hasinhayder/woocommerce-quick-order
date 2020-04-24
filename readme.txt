@@ -31,13 +31,9 @@ Yes
 Yes!
 
 
-== Screenshots ==
-
-1. This screen shot description corresponds to screenshot-1.(png|jpg|jpeg|gif).
-2. This is the second screen shot
-
 == Changelog ==
+= 1.0.0 =
+* April 25, 2020 - Initial Release
 
 
-== Upgrade Notice ==
 
