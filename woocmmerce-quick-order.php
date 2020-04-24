@@ -16,11 +16,11 @@ function wqo_scripts($hook) {
         wp_enqueue_script('wqo-script', plugin_dir_url(__FILE__) . 'assets/js/wqo.js', array('jquery'), time(), true);
         $nonce = wp_create_nonce('wqo');
         wp_localize_script('wqo-script', 'wqo', array(
-            'nonce' => $nonce, 
+            'nonce' => $nonce,
             'ajax_url' => admin_url('admin-ajax.php'),
-            'dc'=>__('Discount Coupon','wqo'),
-            'cc'=>__('Coupon Code','wqo'),
-            'dt'=>__('Discount In Taka','wqo')
+            'dc' => __('Discount Coupon', 'wqo'),
+            'cc' => __('Coupon Code', 'wqo'),
+            'dt' => __('Discount In Taka', 'wqo')
         ));
     }
 }
@@ -100,7 +100,7 @@ function wqo_admin_page() {
                         <select class='wqo-control' name='item' id='item'>
                             <option value="0">Select One</option>
                             <?php
-                            $products = wc_get_products(array('post_status' => 'published'));
+                            $products = wc_get_products(array('post_status' => 'published', 'posts_per_page' => -1));
                             foreach ($products as $product) {
                             ?>
                                 <option value='<?php echo $product->get_ID(); ?>''><?php echo $product->get_Name(); ?></option>
