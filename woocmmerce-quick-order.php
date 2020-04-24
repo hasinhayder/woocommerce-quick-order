@@ -14,9 +14,6 @@ function wqo_scripts($hook) {
     if ('toplevel_page_quick-order-create' == $hook) {
         wp_enqueue_style('wqo-style', plugin_dir_url(__FILE__) . 'assets/css/style.css', array(), time());
         wp_enqueue_script('wqo-script', plugin_dir_url(__FILE__) . 'assets/js/wqo.js', array('jquery', 'thickbox'), time(), true);
-        if (apply_filters('wqo_display_github_profile', true)) {
-            wp_enqueue_script('lepture-script', '//cdn.jsdelivr.net/github-cards/latest/widget.js', array(), '1.0', true);
-        }
         $nonce = wp_create_nonce('wqo');
         wp_localize_script('wqo-script', 'wqo', array(
             'nonce' => $nonce,
@@ -134,7 +131,6 @@ function wqo_admin_page() {
                 </form>
             </div>
             <div class="wqo-info">
-                <div class="github-card" data-github="hasinhayder" data-width="100%" data-height="" data-theme="medium"></div>
             </div>
             <div class="wqo-clearfix"></div>
         </div>

@@ -17,6 +17,9 @@
         });
 
         $("#email").on('blur', function () {
+            if($(this).val()==''){
+                return;
+            }
             $("#first_name").val('');
             $("#last_name").val('');
             let email = $(this).val();
