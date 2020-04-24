@@ -40,8 +40,6 @@ add_action('admin_menu', function () {
 
 function qofw_admin_page() {
 ?>
-    <!-- <h2><?php _e('Quick Order Create', 'qofw'); ?></h2> -->
-
     <div class="qofw-form-wrapper">
         <div class="qofw-form-title">
             <h4><?php _e('WooCommerce Quick Order', 'qofw'); ?></h4>
